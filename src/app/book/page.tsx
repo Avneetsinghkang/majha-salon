@@ -43,6 +43,7 @@ export default function BookPage() {
   const [customerPhone, setCustomerPhone] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
+  const [bookingRef, setBookingRef] = useState("")
 
   useEffect(() => {
     async function loadUser() {
@@ -125,7 +126,7 @@ export default function BookPage() {
 
     const closed =
       row?.is_closed === true ||
-      CLOSED_DAYS.includes(weekday) && !row
+      (CLOSED_DAYS.includes(weekday) && !row)
 
     if (closed) {
       setDayClosed(true)
@@ -180,21 +181,29 @@ export default function BookPage() {
       startDateTime.getTime() + selectedService.duration_minutes * 60000
     )
 
-    const { error: insertError } = await supabase.from("appointments").insert({
-      service_id: selectedService.id,
-      customer_name: customerName,
-      customer_email: customerEmail,
-      customer_phone: customerPhone || null,
-      start_time: startDateTime.toISOString(),
-      end_time: endDateTime.toISOString(),
-      status: "confirmed",
-    })
+    const { data: inserted, error: insertError } = await supabase
+      .from("appointments")
+      .insert({
+        service_id: selectedService.id,
+        customer_name: customerName,
+        customer_email: customerEmail,
+        customer_phone: customerPhone || null,
+        start_time: startDateTime.toISOString(),
+        end_time: endDateTime.toISOString(),
+        status: "confirmed",
+      })
+      .select("id")
+      .single()
 
     setIsSubmitting(false)
 
     if (insertError) {
       setError(insertError.message || "This time was just booked. Please pick another.")
     } else {
+      const ref = inserted?.id
+        ? String(inserted.id).replace(/-/g, "").slice(0, 8).toUpperCase()
+        : ""
+      setBookingRef(ref)
       setStep(5)
     }
   }
@@ -413,11 +422,19 @@ export default function BookPage() {
             <h2 className="text-3xl font-light tracking-[0.15em] mb-4">BOOKING CONFIRMED</h2>
             <div className="w-12 h-0.5 bg-yellow-500 mx-auto mb-6"></div>
             <p className="text-gray-400 mb-2">Thank you, {customerName}</p>
-            <p className="text-yellow-500 text-lg mb-10">
+            <p className="text-yellow-500 text-lg mb-4">
               {selectedService?.name}
               <br />
               {selectedDate} at {selectedTime}
             </p>
+            {bookingRef && (
+              <p className="text-white mb-10">
+                Booking reference:{" "}
+                <span className="text-yellow-500 font-semibold tracking-wider">
+                  {bookingRef}
+                </span>
+              </p>
+            )}
             <Link href="/my-bookings">
               <Button className="bg-yellow-500 hover:bg-yellow-400 text-black font-semibold px-8">
                 VIEW MY BOOKINGS

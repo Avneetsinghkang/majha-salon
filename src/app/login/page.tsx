@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase"
 import Link from "next/link"
+import Navbar from "@/components/Navbar"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -18,10 +19,7 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
       setError(error.message)
@@ -34,57 +32,56 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-2">Welcome Back</h1>
-        <p className="text-center text-gray-500 mb-8">
-          Login to manage your appointments
-        </p>
+    <div className="min-h-screen bg-black">
+      <Navbar />
+      <div className="min-h-screen flex items-center justify-center px-4 pt-24">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+          <h1 className="text-3xl font-bold text-center text-black mb-2">Welcome Back</h1>
+          <p className="text-center text-gray-500 mb-8">Login to manage your appointments</p>
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="you@example.com"
-            />
-          </div>
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                placeholder="you@example.com"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="••••••••"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                placeholder="••••••••"
+              />
+            </div>
 
-          {error && (
-            <p className="text-red-500 text-sm text-center">{error}</p>
-          )}
+            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition disabled:opacity-50"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-yellow-500 text-black py-3 rounded-lg font-semibold hover:bg-yellow-400 disabled:opacity-50"
+            >
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Don’t have an account?{" "}
-          <Link href="/signup" className="text-black font-medium hover:underline">
-            Sign up
-          </Link>
-        </p>
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Don’t have an account?{" "}
+            <Link href="/signup" className="text-black font-medium hover:underline">
+              Sign up
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )
