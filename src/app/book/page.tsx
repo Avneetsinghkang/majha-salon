@@ -172,6 +172,10 @@ export default function BookPage() {
       setError("Please enter your name and email.")
       return
     }
+    if (selectedDate < today) {
+      setError("Please choose today or a future date.")
+      return
+    }
 
     setIsSubmitting(true)
     setError("")
@@ -297,7 +301,11 @@ export default function BookPage() {
               <p className="text-yellow-500 mt-6">Closed this day. Please pick another date.</p>
             )}
 
-            {selectedDate && !dayClosed && (
+            {selectedDate && selectedDate < today && (
+              <p className="text-red-500 mt-6">Please choose today or a future date.</p>
+            )}
+
+            {selectedDate && !dayClosed && selectedDate >= today && (
               <div className="mt-10 flex justify-end">
                 <Button
                   onClick={() => setStep(3)}
